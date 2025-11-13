@@ -1,0 +1,328 @@
+/* ===== SISTEMA DE PROGRESO VISUAL v2.3.0 ===== */
+.progress-section {
+    background: linear-gradient(135deg, var(--dark) 0%, #151530 100%);
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
+    animation: progressShine 3s infinite;
+}
+
+@keyframes progressShine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.progress-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.progress-stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--progress-inactive);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.step-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+.step-label {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.step-connector {
+    position: absolute;
+    top: 25px;
+    left: 60%;
+    width: 80%;
+    height: 2px;
+    background: var(--progress-inactive);
+    z-index: -1;
+    transition: all 0.3s ease;
+}
+
+.progress-step:last-child .step-connector {
+    display: none;
+}
+
+/* Estados activos */
+.progress-step.active .step-icon {
+    background: var(--progress-active);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    transform: scale(1.1);
+}
+
+.progress-step.active .step-icon::before {
+    opacity: 1;
+    animation: iconShine 2s infinite;
+}
+
+.progress-step.active .step-label {
+    color: var(--primary);
+    font-weight: 600;
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+.progress-step.completed .step-icon {
+    background: var(--progress-active);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+.progress-step.completed .step-connector {
+    background: var(--progress-active);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* Barra de progreso lineal */
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--progress-inactive);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--progress-active), var(--accent));
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes iconShine {
+    0%, 100% { transform: rotate(45deg) translateX(-100%); }
+    50% { transform: rotate(45deg) translateX(100%); }
+}
+
+/* Estados específicos por nivel */
+.progress-step[data-step="1"].active ~ .progress-bar .progress-fill {
+    width: 25% !important;
+}
+
+.progress-step[data-step="2"].active ~ .progress-bar .progress-fill {
+    width: 50% !important;
+}
+
+.progress-step[data-step="3"].active ~ .progress-bar .progress-fill {
+    width: 75% !important;
+}
+
+.progress-step[data-step="4"].active ~ .progress-bar .progress-fill {
+    width: 100% !important;
+}
+
+/* Indicador de progreso numérico */
+.progress-info {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: 'Orbitron', monospace;
+}
+
+.progress-percentage {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* Efectos de partículas en progreso */
+.progress-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* Animaciones de transición */
+@keyframes pulseStep {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.progress-step.active {
+    animation: pulseStep 0.6s ease;
+}
+
+/* Efecto de completado */
+.progress-step.completed .step-icon::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--darker);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .progress-stepper {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .progress-step {
+        flex: 0 0 calc(50% - 1rem);
+        margin-bottom: 0.5rem;
+    }
+    
+    .step-connector {
+        display: none;
+    }
+    
+    .step-label {
+        font-size: 0.7rem;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .progress-info {
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-step {
+        flex: 0 0 100%;
+    }
+    
+    .progress-stepper {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .step-connector {
+        display: block;
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 2px;
+        height: 20px;
+        margin: 0.2rem 0;
+    }
+}
+
+/* Estados de error/advertencia */
+.progress-step.error .step-icon {
+    background: var(--danger);
+    border-color: var(--danger);
+}
+
+.progress-step.warning .step-icon {
+    background: var(--warning);
+    border-color: var(--warning);
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .progress-step.active .step-icon {
+        border-width: 3px;
+    }
+    
+    .progress-fill {
+        height: 8px;
+    }
+}
+
+/* Modo de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .progress-step.active {
+        animation: none;
+    }
+    
+    .progress-fill::after {
+        animation: none;
+    }
+    
+    .progress-section::before {
+        animation: none;
+    }
+}

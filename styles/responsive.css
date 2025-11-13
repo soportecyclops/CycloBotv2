@@ -1,0 +1,217 @@
+/* ===== RESPONSIVE DESIGN v2.3.0 ===== */
+
+/* Tablets y dispositivos medianos */
+@media (max-width: 1024px) {
+    .cyber-main {
+        grid-template-columns: 1fr;
+    }
+    
+    .botones-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .progress-container {
+        max-width: 90%;
+    }
+}
+
+/* Dispositivos móviles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .cyber-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .status-panel {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .status-grid {
+        justify-content: space-between;
+    }
+    
+    .cyber-title {
+        font-size: 1.3rem;
+    }
+    
+    .cyber-main {
+        gap: 10px;
+    }
+    
+    .cyber-chat-messages {
+        max-height: 300px;
+        padding: 10px;
+    }
+    
+    .botones-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+    
+    /* Progress system mobile */
+    .progress-section {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .progress-stepper {
+        margin-bottom: 0.8rem;
+    }
+}
+
+/* Dispositivos móviles pequeños */
+@media (max-width: 480px) {
+    .cyber-title {
+        font-size: 1.1rem;
+    }
+    
+    .logo-container {
+        gap: 8px;
+    }
+    
+    .cyber-logo {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .quick-actions-advanced {
+        flex-direction: column;
+    }
+    
+    .cyber-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cyber-chat-messages {
+        max-height: 250px;
+        padding: 8px;
+    }
+    
+    .message-content {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
+    
+    /* Progress system small mobile */
+    .progress-step {
+        flex: 0 0 100%;
+    }
+    
+    .progress-stepper {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .step-connector {
+        display: block;
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 2px;
+        height: 20px;
+        margin: 0.2rem 0;
+    }
+}
+
+/* Pantallas muy grandes */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    .progress-container {
+        max-width: 1000px;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-height: 600px) and (orientation: landscape) {
+    .cyber-chat-messages {
+        max-height: 200px;
+    }
+    
+    .botones-area {
+        max-height: 120px;
+    }
+    
+    .progress-section {
+        padding: 0.8rem 0;
+        margin-bottom: 0.8rem;
+    }
+    
+    .step-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .step-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Soporte para modo oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+    .cyber-chat-container,
+    .cyber-info-panel,
+    .cyber-header,
+    .cyber-footer {
+        background: linear-gradient(135deg, rgba(5, 5, 16, 0.95) 0%, rgba(10, 10, 26, 0.98) 100%);
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .hologram-effect,
+    .eye-outer-ring,
+    .eye-middle-ring,
+    .scanning-beam,
+    .progress-step.active {
+        animation: none;
+    }
+    
+    .progress-fill::after {
+        animation: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --text-primary: #ffffff;
+        --text-secondary: #00f3ff;
+        --border: #00f3ff;
+    }
+    
+    .cyber-btn {
+        border-width: 2px;
+    }
+    
+    .progress-step.active .step-icon {
+        border-width: 3px;
+    }
+}
+
+/* Mejoras de foco para navegación con teclado */
+.cyber-btn:focus {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.progress-step:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: 8px;
+}

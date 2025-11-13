@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyclopsBot - Asistente Técnico v2.3.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <!-- Fondo con partículas -->
+    <div class="particles-background"></div>
+    <div class="neon-glow"></div>
+    <div class="circuit-lines"></div>
+
+    <div class="container">
+        <!-- Header Compacto -->
+        <header class="cyber-header">
+            <div class="logo-container">
+                <div class="cyber-logo">
+                    <div class="hologram-effect">
+                        <div class="cyclops-eye-advanced">
+                            <div class="eye-outer-ring">
+                                <div class="eye-middle-ring">
+                                    <div class="eye-core">
+                                        <div class="pupil-advanced"></div>
+                                        <div class="scanning-beam"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-container">
+                    <h1 class="cyber-title">CYCLOPSBOT</h1>
+                    <div class="subtitle-grid">
+                        <span class="subtitle-chip">DIAGNÓSTICO INTELIGENTE</span>
+                        <span class="version-badge">v2.3.0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-panel">
+                <div class="status-grid">
+                    <div class="status-item online">
+                        <i class="fas fa-server"></i>
+                        <span>BD</span>
+                    </div>
+                    <div class="status-item online">
+                        <i class="fas fa-brain"></i>
+                        <span>IA</span>
+                    </div>
+                    <div class="status-item online">
+                        <i class="fas fa-network-wired"></i>
+                        <span>ONLINE</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SISTEMA DE PROGRESO VISUAL - NUEVO -->
+        <section id="progress-section" class="progress-section">
+            <div class="progress-container">
+                <div class="progress-stepper">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-icon">🔍</div>
+                        <div class="step-label">Categoría</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-icon">📂</div>
+                        <div class="step-label">Subcategoría</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-icon">❓</div>
+                        <div class="step-label">Problema</div>
+                        <div class="step-connector"></div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-icon">💡</div>
+                        <div class="step-label">Diagnóstico</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 25%"></div>
+                </div>
+            </div>
+        </section>
+
+        <main class="cyber-main">
+            <!-- Chat Principal con Área de Botones Expandible -->
+            <div class="cyber-chat-container">
+                <div class="chat-header-advanced">
+                    <div class="header-terminal">
+                        <div class="terminal-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="terminal-title">
+                            <i class="fas fa-terminal"></i>
+                            <span>CONSOLA DE DIAGNÓSTICO</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Área de Mensajes - Scrollable -->
+                <div class="cyber-chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-avatar">
+                            <div class="mini-eye"></div>
+                        </div>
+                        <div class="message-content">
+                            <div class="action-call">
+                                <h3>🔍 SELECCIONA EL TIPO DE PROBLEMA</h3>
+                                <p>Elige una categoría para comenzar el diagnóstico</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Área de Botones Dedicada - Siempre visible -->
+                <div class="botones-area" id="botonesArea">
+                    <!-- Los botones aparecerán aquí -->
+                </div>
+                
+                <!-- Botones de Control -->
+                <div class="cyber-chat-input">
+                    <div class="quick-actions-advanced">
+                        <button class="cyber-btn primary" data-action="start">
+                            <i class="fas fa-play"></i>
+                            <span>INICIAR</span>
+                        </button>
+                        <button class="cyber-btn secondary" data-action="reset">
+                            <i class="fas fa-redo"></i>
+                            <span>REINICIAR</span>
+                        </button>
+                        <button class="cyber-btn tertiary" data-action="help">
+                            <i class="fas fa-question"></i>
+                            <span>AYUDA</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel Lateral Compacto -->
+            <div class="cyber-info-panel">
+                <div class="panel-header">
+                    <i class="fas fa-chart-network"></i>
+                    <span>PANEL</span>
+                </div>
+                
+                <div class="stats-advanced">
+                    <h3 class="section-title">ESTADÍSTICAS</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="problemsCount">316</span>
+                                <span class="stat-label">PROBLEMAS</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-bug"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="diagnosticsCount">2</span>
+                                <span class="stat-label">DIAGNÓSTICOS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="capabilities-grid">
+                    <h3 class="section-title">CATEGORÍAS</h3>
+                    <div class="capability-item">
+                        <div class="capability-icon">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                        <div class="capability-info">
+                            <span class="capability-title">INTERNET</span>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <div class="capability-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="capability-info">
+                            <span class="capability-title">HARDWARE</span>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <div class="capability-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="capability-info">
+                            <span class="capability-title">SOFTWARE</span>
+                        </div>
+                    </div>
+                    <div class="capability-item">
+                        <div class="capability-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="capability-info">
+                            <span class="capability-title">MÓVILES</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer Compacto -->
+        <footer class="cyber-footer">
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2024 CyclopsBot - Diagnóstico Inteligente
+                </div>
+                <div class="build-info">
+                    v2.3.0 | Sistema de Progreso Visual
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/utils/helpers.js"></script>
+    <script src="src/features/ProgressSystem.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
