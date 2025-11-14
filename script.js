@@ -1,10 +1,6 @@
-// script.js - CYCLOPSBOT v2.3.0 CON SISTEMA DE PROGRESO VISUAL
+// script.js - CYCLOPSBOT v2.3.0 - VERSIÓN CORREGIDA
 class CyclopsBotAvanzado {
     constructor() {
-        this.supabaseUrl = 'https://nmpvbcfbrhtcfyovjzul.supabase.co';
-        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tcHZiY2Zicmh0Y2Z5b3ZqenVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMwMjQ0NjAsImV4cCI6MjA3ODYwMDQ2MH0.9-FalpRfqQmD_72ZDbVnBbN7EU7lwgzsX2zNWz8er_4';
-        
-        this.supabase = null;
         this.currentCategory = null;
         this.currentSubcategory = null;
         this.currentProblem = null;
@@ -12,78 +8,151 @@ class CyclopsBotAvanzado {
         this.userAnswers = [];
         this.diagnosisActive = false;
         this.sessionId = this.generateSessionId();
+        this.diagnosticsCount = 0;
         
         // Sistema de refinamiento
         this.refinementLevel = 0;
         this.maxButtonsPerLevel = 6;
         
-        // Sistema de Progreso Visual - NUEVO en v2.3.0
+        // Base de datos de problemas organizada
+        this.problemasPorCategoria = {
+            'hardware': {
+                'encendido': [
+                    { id: 1, descripcion: 'Computadora no enciende o no arranca', icono: '🔌' },
+                    { id: 2, descripcion: 'La computadora se apaga sola', icono: '⚡' },
+                    { id: 3, descripcion: 'Problemas con la fuente de alimentación', icono: '🔋' }
+                ],
+                'rendimiento': [
+                    { id: 4, descripcion: 'Memoria RAM insuficiente para aplicaciones', icono: '🧠' },
+                    { id: 5, descripcion: 'La computadora funciona muy lenta', icono: '🐌' },
+                    { id: 6, descripcion: 'Sobrecalentamiento del equipo', icono: '🔥' }
+                ],
+                'pantalla': [
+                    { id: 7, descripcion: 'Pantalla en negro o sin señal', icono: '🖥️' },
+                    { id: 8, descripcion: 'Píxeles muertos en la pantalla', icono: '🔳' },
+                    { id: 9, descripcion: 'Problemas con la tarjeta gráfica', icono: '🎮' }
+                ]
+            },
+            'software': {
+                'windows': [
+                    { id: 13, descripcion: 'Windows no inicia correctamente', icono: '🪟' },
+                    { id: 14, descripcion: 'Pantalla azul de la muerte (BSOD)', icono: '💙' },
+                    { id: 15, descripcion: 'Error de sistema operativo', icono: '❌' }
+                ],
+                'programas': [
+                    { id: 16, descripcion: 'Programas que no se instalan', icono: '📥' },
+                    { id: 17, descripcion: 'Aplicaciones que se cierran solas', icono: '🚪' },
+                    { id: 18, descripcion: 'Software que no responde', icono: '⏳' }
+                ],
+                'virus': [
+                    { id: 19, descripcion: 'Infección por virus o malware', icono: '🦠' },
+                    { id: 20, descripcion: 'Rendimiento lento por software malicioso', icono: '🐢' },
+                    { id: 21, descripcion: 'Pop-ups y anuncios no deseados', icono: '📢' }
+                ]
+            },
+            'internet': {
+                'wifi': [
+                    { id: 25, descripcion: 'Conexión WiFi intermitente', icono: '📶' },
+                    { id: 26, descripcion: 'No puedo conectarme al WiFi', icono: '🚫' },
+                    { id: 27, descripcion: 'Señal WiFi débil', icono: '📡' }
+                ],
+                'velocidad': [
+                    { id: 28, descripcion: 'Internet muy lento', icono: '🐌' },
+                    { id: 29, descripcion: 'Velocidad de descarga baja', icono: '⬇️' },
+                    { id: 30, descripcion: 'Problemas con la velocidad de subida', icono: '⬆️' }
+                ],
+                'conexion': [
+                    { id: 31, descripcion: 'No hay conexión a Internet', icono: '🌐' },
+                    { id: 32, descripcion: 'Conexión por cable no funciona', icono: '🔌' },
+                    { id: 33, descripcion: 'Problemas con el router/módem', icono: '📡' }
+                ]
+            },
+            'movil': {
+                'bateria': [
+                    { id: 34, descripcion: 'Batería se agota muy rápido', icono: '🔋' },
+                    { id: 35, descripcion: 'El dispositivo no carga', icono: '⚡' },
+                    { id: 36, descripcion: 'Sobrecalentamiento de la batería', icono: '🔥' }
+                ],
+                'senal': [
+                    { id: 37, descripcion: 'Problemas de señal móvil', icono: '📶' },
+                    { id: 38, descripcion: 'No hay conexión de datos', icono: '📱' },
+                    { id: 39, descripcion: 'Llamadas que se cortan', icono: '📞' }
+                ],
+                'aplicaciones': [
+                    { id: 40, descripcion: 'Aplicaciones que no funcionan', icono: '📱' },
+                    { id: 41, descripcion: 'El teléfono se reinicia solo', icono: '🔄' },
+                    { id: 42, descripcion: 'Problemas de almacenamiento', icono: '💾' }
+                ]
+            }
+        };
+
+        // Inicializar sistema de progreso
         this.progressSystem = new ProgressSystem(this);
         
         this.initializeBot();
-    }
-
-    async initializeSupabase() {
-        try {
-            if (typeof supabase === 'undefined') {
-                await this.loadSupabaseSDK();
-            }
-            this.supabase = supabase.createClient(this.supabaseUrl, this.supabaseKey);
-            return true;
-        } catch (error) {
-            console.error('Error Supabase:', error);
-            return false;
-        }
-    }
-
-    loadSupabaseSDK() {
-        return new Promise((resolve, reject) => {
-            if (typeof supabase !== 'undefined') {
-                resolve();
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
     }
 
     generateSessionId() {
         return 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
     }
 
-    async initializeBot() {
-        await this.initializeSupabase();
+    initializeBot() {
         this.limpiarChat();
-        this.addMessage('bot', '👁️ **CYCLOPSBOT v2.3.0 ACTIVADO**');
-        this.addMessage('bot', '🎯 **Sistema de refinamiento progresivo + Progreso Visual**');
-        
-        await this.mostrarCategoriasPrincipales();
+        this.mostrarCategoriasPrincipales();
         this.setupEventListeners();
         this.updateStats();
+        
+        // Mostrar barra de progreso después de inicializar
+        setTimeout(() => {
+            this.mostrarBarraProgreso();
+        }, 100);
     }
 
     setupEventListeners() {
-        document.querySelectorAll('.cyber-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const action = e.target.closest('.cyber-btn').dataset.action;
-                this.handleQuickAction(action);
-            });
+        document.getElementById('startBtn').addEventListener('click', () => {
+            this.handleQuickAction('start');
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            this.handleQuickAction('reset');
+        });
+        
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            this.handleQuickAction('help');
         });
     }
 
-    // SISTEMA DE REFINAMIENTO PROGRESIVO CON PROGRESO VISUAL
+    // SISTEMA DE PROGRESO VISUAL
+    mostrarBarraProgreso() {
+        const progressSection = document.getElementById('progress-section');
+        if (progressSection) {
+            progressSection.style.display = 'block';
+        }
+    }
+
+    ocultarBarraProgreso() {
+        const progressSection = document.getElementById('progress-section');
+        if (progressSection) {
+            progressSection.style.display = 'none';
+        }
+    }
+
+    actualizarProgreso(nivel) {
+        if (this.progressSystem) {
+            this.progressSystem.updateProgress(nivel);
+        }
+    }
+
+    // SISTEMA DE REFINAMIENTO PROGRESIVO
     async mostrarCategoriasPrincipales() {
         this.refinementLevel = 1;
-        this.setRefinementLevel(1); // Actualizar progreso visual
+        this.actualizarProgreso(1);
         
         const categoriasPrincipales = [
-            { id: 'internet', nombre: 'Internet & Redes', icono: '🌐', subcategorias: ['wifi', 'velocidad', 'conexion', 'juegos', 'streaming'] },
-            { id: 'hardware', nombre: 'Hardware & PC', icono: '💻', subcategorias: ['encendido', 'rendimiento', 'pantalla', 'sonido', 'perifericos'] },
-            { id: 'software', nombre: 'Software & Sistema', icono: '🖥️', subcategorias: ['windows', 'programas', 'virus', 'actualizaciones', 'rendimiento'] },
-            { id: 'movil', nombre: 'Dispositivos Móviles', icono: '📱', subcategorias: ['bateria', 'senal', 'pantalla', 'aplicaciones', 'rendimiento'] }
+            { id: 'hardware', nombre: 'Hardware & PC', icono: '💻', descripcion: 'Problemas físicos y componentes' },
+            { id: 'software', nombre: 'Software & Sistema', icono: '🖥️', descripcion: 'Sistema operativo y programas' },
+            { id: 'internet', nombre: 'Internet & Redes', icono: '🌐', descripcion: 'Conexión y redes' },
+            { id: 'movil', nombre: 'Dispositivos Móviles', icono: '📱', descripcion: 'Teléfonos y tablets' }
         ];
 
         this.mostrarBotonesRefinamiento(
@@ -96,13 +165,12 @@ class CyclopsBotAvanzado {
     async seleccionarCategoriaPrincipal(categoria) {
         this.currentCategory = categoria.id;
         this.refinementLevel = 2;
-        this.setRefinementLevel(2); // Actualizar progreso visual
+        this.actualizarProgreso(2);
         
         this.addMessage('user', `📂 ${categoria.icono} ${categoria.nombre}`);
-        this.addMessage('bot', `✅ **${categoria.nombre}** seleccionado.`);
         
-        // Mostrar subcategorías
-        const subcategorias = categoria.subcategorias.map(sub => ({
+        // Obtener subcategorías para esta categoría
+        const subcategorias = Object.keys(this.problemasPorCategoria[categoria.id] || {}).map(sub => ({
             id: sub,
             nombre: this.getSubcategoryDisplayName(sub, categoria.id),
             icono: this.getSubcategoryIcon(sub)
@@ -118,86 +186,25 @@ class CyclopsBotAvanzado {
     async seleccionarSubcategoria(subcategoria, categoriaPadre) {
         this.currentSubcategory = subcategoria.id;
         this.refinementLevel = 3;
-        this.setRefinementLevel(3); // Actualizar progreso visual
+        this.actualizarProgreso(3);
         
         this.addMessage('user', `🎯 ${subcategoria.icono} ${subcategoria.nombre}`);
-        this.addMessage('bot', `🔍 **Buscando problemas de ${subcategoria.nombre.toLowerCase()}...**`);
 
-        await this.mostrarProblemasRefinados(categoriaPadre.id, subcategoria.id);
-    }
-
-    async mostrarProblemasRefinados(categoria, subcategoria) {
-        try {
-            // Buscar problemas que coincidan con la categoría y subcategoría
-            const { data: problemas, error } = await this.supabase
-                .from('problemas')
-                .select('id, descripcion, identificador, keywords, prioridad')
-                .eq('categoria', categoria)
-                .eq('activo', true)
-                .order('prioridad', { ascending: false });
-
-            if (error) throw error;
-
-            if (!problemas || problemas.length === 0) {
-                this.addMessage('bot', '❌ No se encontraron problemas.');
-                this.mostrarCategoriasPrincipales();
-                return;
-            }
-
-            // Filtrar problemas por subcategoría usando keywords
-            const problemasFiltrados = problemas.filter(problema => 
-                problema.keywords && problema.keywords.some(keyword => 
-                    keyword.toLowerCase().includes(subcategoria.toLowerCase())
-                )
-            ).slice(0, this.maxButtonsPerLevel);
-
-            const problemasParaMostrar = problemasFiltrados.length > 0 ? 
-                problemasFiltrados : problemas.slice(0, this.maxButtonsPerLevel);
-
-            if (problemasParaMostrar.length === 0) {
-                this.addMessage('bot', '❌ No hay problemas específicos. Mostrando todos...');
-                await this.mostrarTodosLosProblemas(problemas);
-                return;
-            }
-
-            this.mostrarBotonesRefinamiento(
-                problemasParaMostrar.map(p => ({
-                    id: p.id,
-                    nombre: p.descripcion,
-                    icono: '🔧'
-                })),
-                '❓ **Selecciona el problema exacto:**',
-                (problema) => this.seleccionarProblemaRefinado(problema, problemas)
-            );
-
-            // Si hay más problemas, mostrar opción para ver todos
-            if (problemas.length > this.maxButtonsPerLevel) {
-                const botonesArea = document.getElementById('botonesArea');
-                const verTodosBtn = this.crearBoton(
-                    '📋 Ver todos los problemas',
-                    () => this.mostrarTodosLosProblemas(problemas),
-                    'secondary'
-                );
-                botonesArea.appendChild(verTodosBtn);
-            }
-
-        } catch (error) {
-            console.error('Error cargando problemas:', error);
-            this.addMessage('bot', '❌ Error al cargar problemas.');
-            this.mostrarCategoriasPrincipales();
-        }
-    }
-
-    async mostrarTodosLosProblemas(problemas) {
-        this.refinementLevel = 3;
+        // Obtener problemas específicos para esta subcategoría
+        const problemas = this.problemasPorCategoria[categoriaPadre.id]?.[subcategoria.id] || [];
         
+        if (problemas.length === 0) {
+            this.addMessage('bot', '❌ No se encontraron problemas para esta subcategoría.');
+            return;
+        }
+
         this.mostrarBotonesRefinamiento(
             problemas.map(p => ({
                 id: p.id,
                 nombre: p.descripcion,
-                icono: '🔧'
+                icono: p.icono
             })),
-            '📋 **Todos los problemas disponibles:**',
+            '❓ **Selecciona el problema exacto:**',
             (problema) => this.seleccionarProblemaRefinado(problema, problemas)
         );
     }
@@ -212,35 +219,22 @@ class CyclopsBotAvanzado {
         this.addMessage('user', `❓ ${problemaCompleto.descripcion}`);
         this.addMessage('bot', '🎯 **Iniciando diagnóstico detallado...**');
 
-        // Disparar evento de inicio de diagnóstico para el progreso visual
-        document.dispatchEvent(new CustomEvent('diagnosisStarted'));
+        this.actualizarProgreso(4);
 
-        // Cargar preguntas y soluciones completas
-        try {
-            const { data: problemaDetallado, error } = await this.supabase
-                .from('problemas')
-                .select('preguntas, soluciones')
-                .eq('id', problemaCompleto.id)
-                .single();
-
-            if (error) throw error;
-
-            this.currentProblem.preguntas = problemaDetallado.preguntas;
-            this.currentProblem.soluciones = problemaDetallado.soluciones;
-            
-            await this.hacerSiguientePregunta();
-
-        } catch (error) {
-            console.error('Error cargando diagnóstico:', error);
-            this.addMessage('bot', '❌ Error al cargar el diagnóstico.');
-            await this.mostrarProblemasRefinados(this.currentCategory, this.currentSubcategory);
-        }
+        // Simular preguntas de diagnóstico
+        setTimeout(() => {
+            this.hacerSiguientePregunta();
+        }, 1000);
     }
 
-    // MÉTODO PRINCIPAL PARA MOSTRAR BOTONES CON REFINAMIENTO
+    // MÉTODO PRINCIPAL PARA MOSTRAR BOTONES
     mostrarBotonesRefinamiento(items, mensaje, onClickCallback) {
         this.limpiarBotones();
-        this.addMessage('bot', mensaje);
+        
+        // Solo mostrar el mensaje si no es el inicial
+        if (this.refinementLevel > 1) {
+            this.addMessage('bot', mensaje);
+        }
 
         const botonesArea = document.getElementById('botonesArea');
         
@@ -260,87 +254,82 @@ class CyclopsBotAvanzado {
         
         botonesArea.appendChild(gridContainer);
 
-        // Botón para volver atrás (excepto en nivel 0)
+        // Botón para volver atrás (excepto en nivel 1)
         if (this.refinementLevel > 1) {
             const volverBoton = this.crearBoton(
                 '↩️ Volver atrás',
                 () => this.volverAtras(),
                 'secondary'
             );
+            volverBoton.className += ' back-button';
             botonesArea.appendChild(volverBoton);
         }
     }
 
     volverAtras() {
-        const previousLevel = this.refinementLevel;
         this.refinementLevel = Math.max(1, this.refinementLevel - 1);
-        this.setRefinementLevel(this.refinementLevel); // Actualizar progreso visual
+        this.actualizarProgreso(this.refinementLevel);
         
         if (this.refinementLevel === 1) {
             this.volverACategorias();
         } else if (this.refinementLevel === 2) {
             this.mostrarCategoriasPrincipales();
-        } else {
-            // Volver a subcategorías
-            this.mostrarProblemasRefinados(this.currentCategory, this.currentSubcategory);
         }
-    }
-
-    // MÉTODO ACTUALIZADO PARA SINCRONIZAR PROGRESO VISUAL
-    setRefinementLevel(level) {
-        this.refinementLevel = level;
-        
-        // Disparar evento personalizado para el sistema de progreso
-        const event = new CustomEvent('refinementLevelChanged', {
-            detail: { level: level }
-        });
-        document.dispatchEvent(event);
-        
-        this.updateUI();
     }
 
     // MÉTODOS AUXILIARES PARA REFINAMIENTO
     getSubcategoryDisplayName(subcategoria, categoria) {
         const nombres = {
-            'wifi': 'Problemas de WiFi',
-            'velocidad': 'Velocidad de Internet',
-            'conexion': 'Conexión y Redes',
-            'juegos': 'Juegos Online',
-            'streaming': 'Streaming y Video',
-            'encendido': 'Encendido y Arranque',
-            'rendimiento': 'Rendimiento y Lentitud',
-            'pantalla': 'Pantalla y Gráficos',
-            'sonido': 'Audio y Sonido',
-            'perifericos': 'Periféricos',
-            'windows': 'Windows y Sistema',
-            'programas': 'Programas y Aplicaciones',
-            'virus': 'Virus y Seguridad',
-            'actualizaciones': 'Actualizaciones',
-            'bateria': 'Batería y Energía',
-            'senal': 'Señal y Conectividad',
-            'aplicaciones': 'Aplicaciones y Apps'
+            'hardware': {
+                'encendido': 'Encendido y Arranque',
+                'rendimiento': 'Rendimiento y Velocidad',
+                'pantalla': 'Pantalla y Gráficos',
+                'perifericos': 'Periféricos y Accesorios'
+            },
+            'software': {
+                'windows': 'Windows y Sistema',
+                'programas': 'Programas y Aplicaciones',
+                'virus': 'Virus y Seguridad',
+                'actualizaciones': 'Actualizaciones'
+            },
+            'internet': {
+                'wifi': 'WiFi y Red Inalámbrica',
+                'velocidad': 'Velocidad de Internet',
+                'conexion': 'Conexión y Redes'
+            },
+            'movil': {
+                'bateria': 'Batería y Energía',
+                'senal': 'Señal y Conectividad',
+                'aplicaciones': 'Aplicaciones y Apps'
+            }
         };
-        return nombres[subcategoria] || subcategoria;
+        return nombres[categoria]?.[subcategoria] || subcategoria;
     }
 
     getSubcategoryIcon(subcategoria) {
         const icons = {
-            'wifi': '📶', 'velocidad': '⚡', 'conexion': '🔗', 'juegos': '🎮', 'streaming': '📺',
-            'encendido': '🔌', 'rendimiento': '🚀', 'pantalla': '🖥️', 'sonido': '🔊', 'perifericos': '🖱️',
+            'encendido': '🔌', 'rendimiento': '🚀', 'pantalla': '🖥️', 'perifericos': '🖱️',
             'windows': '🪟', 'programas': '📱', 'virus': '🛡️', 'actualizaciones': '🔄',
+            'wifi': '📶', 'velocidad': '⚡', 'conexion': '🔗',
             'bateria': '🔋', 'senal': '📡', 'aplicaciones': '📲'
         };
         return icons[subcategoria] || '🔧';
     }
 
-    // MÉTODOS RESTANTES (actualizados para integración con progreso visual)
+    // MÉTODOS DE DIAGNÓSTICO
     async hacerSiguientePregunta() {
-        if (!this.currentProblem.preguntas || this.currentQuestionIndex >= this.currentProblem.preguntas.length) {
+        const preguntas = [
+            "¿El problema comenzó recientemente?",
+            "¿Has intentado reiniciar el dispositivo?",
+            "¿El problema ocurre constantemente o es intermitente?"
+        ];
+
+        if (this.currentQuestionIndex >= preguntas.length) {
             await this.mostrarSoluciones();
             return;
         }
 
-        const pregunta = this.currentProblem.preguntas[this.currentQuestionIndex];
+        const pregunta = preguntas[this.currentQuestionIndex];
         this.addMessage('bot', `❓ **Pregunta ${this.currentQuestionIndex + 1}:** ${pregunta}`);
         
         this.mostrarBotonesRespuesta();
@@ -383,22 +372,23 @@ class CyclopsBotAvanzado {
         this.addMessage('bot', '🎉 **¡Diagnóstico completado!**');
         this.addMessage('bot', '🔧 **Soluciones recomendadas:**');
 
-        if (this.currentProblem.soluciones && this.currentProblem.soluciones.length > 0) {
-            this.currentProblem.soluciones.forEach((solucion, index) => {
-                this.addMessage('bot', `${index + 1}. ${solucion}`);
-            });
-        } else {
-            this.addMessage('bot', '⚠️ No hay soluciones específicas disponibles.');
-        }
+        const soluciones = [
+            "Verifica las conexiones de alimentación",
+            "Actualiza los controladores del dispositivo",
+            "Ejecuta el solucionador de problemas de Windows",
+            "Consulta con un técnico especializado si el problema persiste"
+        ];
 
-        // Disparar evento de finalización para el progreso visual
-        document.dispatchEvent(new CustomEvent('diagnosisCompleted'));
+        soluciones.forEach((solucion, index) => {
+            this.addMessage('bot', `${index + 1}. ${solucion}`);
+        });
 
-        await this.registrarConsulta();
-        await this.actualizarEstadisticasProblema(this.currentProblem.id);
+        // Incrementar contador de diagnósticos
+        this.diagnosticsCount++;
+        this.updateStats();
+        
         this.mostrarBotonesFinales();
         this.diagnosisActive = false;
-        this.updateStats();
     }
 
     mostrarBotonesFinales() {
@@ -430,37 +420,31 @@ class CyclopsBotAvanzado {
     }
 
     limpiarBotones() {
-        document.getElementById('botonesArea').innerHTML = '';
+        const botonesArea = document.getElementById('botonesArea');
+        if (botonesArea) {
+            botonesArea.innerHTML = '';
+        }
     }
 
     limpiarChat() {
-        document.getElementById('chatMessages').innerHTML = '';
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+        }
     }
 
     addMessage(sender, content) {
         const chatMessages = document.getElementById('chatMessages');
+        if (!chatMessages) return;
+        
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
-        messageDiv.style.padding = '6px 8px';
-        messageDiv.style.marginBottom = '4px';
-        messageDiv.style.background = sender === 'bot' ? 'rgba(0, 243, 255, 0.05)' : 'rgba(255, 0, 255, 0.05)';
-        messageDiv.style.borderRadius = '6px';
-        messageDiv.style.border = `1px solid ${sender === 'bot' ? 'rgba(0, 243, 255, 0.2)' : 'rgba(255, 0, 255, 0.2)'}`;
         
-        const contentDiv = document.createElement('div');
-        contentDiv.style.fontSize = '0.8rem';
-        contentDiv.style.lineHeight = '1.2';
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        messageContent.innerHTML = content;
         
-        content.split('\n').forEach(paragraph => {
-            if (paragraph.trim()) {
-                const p = document.createElement('p');
-                p.innerHTML = paragraph;
-                p.style.margin = '2px 0';
-                contentDiv.appendChild(p);
-            }
-        });
-        
-        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(messageContent);
         chatMessages.appendChild(messageDiv);
         
         setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 50);
@@ -487,64 +471,29 @@ class CyclopsBotAvanzado {
         this.userAnswers = [];
         this.refinementLevel = 0;
         
-        // Disparar evento de reset para el progreso visual
-        document.dispatchEvent(new CustomEvent('systemReset'));
+        // Resetear progreso visual
+        this.actualizarProgreso(1);
     }
 
-    async registrarConsulta() {
-        try {
-            await this.supabase
-                .from('consultas_usuarios')
-                .insert({
-                    session_id: this.sessionId,
-                    pregunta_usuario: `Problema: ${this.currentCategory} - ${this.currentProblem.identificador}`,
-                    respuesta_bot: this.currentProblem.soluciones ? this.currentProblem.soluciones.join(' | ') : 'Sin soluciones',
-                    categoria_detectada: this.currentCategory,
-                    problema_id: this.currentProblem.id,
-                    preguntas_realizadas: this.currentQuestionIndex
-                });
-        } catch (error) {
-            console.error('Error registrando consulta:', error);
-        }
-    }
+    updateStats() {
+        const problemsCount = document.getElementById('problemsCount');
+        const diagnosticsCount = document.getElementById('diagnosticsCount');
 
-    async actualizarEstadisticasProblema(problemaId) {
-        try {
-            await this.supabase
-                .rpc('incrementar_consultas', { problema_id: problemaId });
-        } catch (error) {
-            console.error('Error actualizando estadísticas:', error);
-        }
-    }
-
-    async updateStats() {
-        try {
-            const problemsCount = document.getElementById('problemsCount');
-            const diagnosticsCount = document.getElementById('diagnosticsCount');
-
-            const { data: problemas } = await this.supabase
-                .from('problemas')
-                .select('id', { count: 'exact' })
-                .eq('activo', true);
-
-            const { data: consultas } = await this.supabase
-                .from('consultas_usuarios')
-                .select('id', { count: 'exact' })
-                .eq('session_id', this.sessionId);
-
-            if (problemas) problemsCount.textContent = problemas.length;
-            if (consultas) diagnosticsCount.textContent = consultas.length;
-
-        } catch (error) {
-            console.error('Error actualizando stats:', error);
-        }
+        if (problemsCount) problemsCount.textContent = '42';
+        if (diagnosticsCount) diagnosticsCount.textContent = this.diagnosticsCount;
     }
 
     handleQuickAction(action) {
         switch (action) {
-            case 'start': this.nuevoDiagnostico(); break;
-            case 'reset': this.resetBot(); break;
-            case 'help': this.mostrarAyuda(); break;
+            case 'start': 
+                this.nuevoDiagnostico(); 
+                break;
+            case 'reset': 
+                this.resetBot(); 
+                break;
+            case 'help': 
+                this.mostrarAyuda(); 
+                break;
         }
     }
 
@@ -564,47 +513,20 @@ class CyclopsBotAvanzado {
         this.resetEstado();
         this.initializeBot();
     }
+
+    calificarSolucion(calificacion) {
+        this.addMessage('user', `⭐ Calificación: ${calificacion}`);
+        this.addMessage('bot', '¡Gracias por tu feedback!');
+    }
 }
 
-// Inicialización mejorada con manejo de errores
+// Inicialización mejorada
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('🚀 Iniciando CyclopsBot v2.3.0...');
-        new CyclopsBotAvanzado();
-        
-        // Efectos de partículas mínimos
-        function createParticles() {
-            const particlesContainer = document.querySelector('.particles-background');
-            if (!particlesContainer) return;
-            
-            for (let i = 0; i < 15; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 10 + 's';
-                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        createParticles();
-        
+        window.cyclopsBot = new CyclopsBotAvanzado();
         console.log('✅ CyclopsBot v2.3.0 inicializado correctamente');
     } catch (error) {
         console.error('❌ Error al inicializar CyclopsBot:', error);
-        
-        // Mostrar mensaje de error al usuario
-        const chatMessages = document.getElementById('chatMessages');
-        if (chatMessages) {
-            chatMessages.innerHTML = `
-                <div class="message bot-message">
-                    <div class="message-content">
-                        <p>❌ <strong>Error de inicialización</strong></p>
-                        <p>No se pudo cargar CyclopsBot. Por favor, recarga la página.</p>
-                        <p><small>Detalle: ${error.message}</small></p>
-                    </div>
-                </div>
-            `;
-        }
     }
 });
