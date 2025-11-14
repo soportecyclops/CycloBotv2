@@ -63,7 +63,7 @@
         </header>
 
         <!-- SISTEMA DE PROGRESO VISUAL - NUEVO -->
-        <section id="progress-section" class="progress-section">
+        <section id="progress-section" class="progress-section" style="display: none;">
             <div class="progress-container">
                 <div class="progress-stepper">
                     <div class="progress-step active" data-step="1">
@@ -126,21 +126,21 @@
                 
                 <!-- Área de Botones Dedicada - Siempre visible -->
                 <div class="botones-area" id="botonesArea">
-                    <!-- Los botones aparecerán aquí -->
+                    <!-- Los botones aparecerán aquí dinámicamente -->
                 </div>
                 
                 <!-- Botones de Control -->
                 <div class="cyber-chat-input">
                     <div class="quick-actions-advanced">
-                        <button class="cyber-btn primary" data-action="start">
+                        <button class="cyber-btn primary" id="startBtn" data-action="start">
                             <i class="fas fa-play"></i>
                             <span>INICIAR</span>
                         </button>
-                        <button class="cyber-btn secondary" data-action="reset">
+                        <button class="cyber-btn secondary" id="resetBtn" data-action="reset">
                             <i class="fas fa-redo"></i>
                             <span>REINICIAR</span>
                         </button>
-                        <button class="cyber-btn tertiary" data-action="help">
+                        <button class="cyber-btn tertiary" id="helpBtn" data-action="help">
                             <i class="fas fa-question"></i>
                             <span>AYUDA</span>
                         </button>
@@ -172,7 +172,7 @@
                                 <i class="fas fa-bug"></i>
                             </div>
                             <div class="stat-info">
-                                <span class="stat-number" id="diagnosticsCount">2</span>
+                                <span class="stat-number" id="diagnosticsCount">0</span>
                                 <span class="stat-label">DIAGNÓSTICOS</span>
                             </div>
                         </div>
@@ -234,5 +234,24 @@
     <script src="src/utils/helpers.js"></script>
     <script src="src/features/ProgressSystem.js"></script>
     <script src="script.js"></script>
+    
+    <script>
+        // Efectos de partículas mínimos
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles-background');
+            if (!particlesContainer) return;
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', createParticles);
+    </script>
 </body>
 </html>
